@@ -107,8 +107,8 @@ function Carta() {
                 </article>
               </div>
               <div className='flex flex-col items-end font-medium justify-end w-full h-full '>
-                <p>Para: {config!.nombrePara}</p>
-                <p>De: {config!.nombreDe}</p>
+                <p>Para:Andrea Celeste Espinoza Montoya </p>
+                <p>De:Franklin Xavier Rodriguez Tinoco </p>
               </div>
             </div>
           )}

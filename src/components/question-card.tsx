@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useConfig } from "../config-storage";
-
-// ✅ Opción B (si NO lo ponés en public):
-// import SEALIONS2 from "../components/SEALIONS2.mp4";
+import LIONS3 from "./LIONS3.png";
+import AFTER_IMG from "./descarga.jpg";
 
 interface QuestionCardProps {
   openQuest: boolean;
@@ -15,20 +14,18 @@ function QuestionCard({ openQuest, AcceptQuest }: QuestionCardProps) {
   const { config } = useConfig();
 
   const [phase, setPhase] = useState<Phase>("question");
-
   const [noCount, setNoCount] = useState(0);
   const [hasMovedNo, setHasMovedNo] = useState(false);
   const [noPos, setNoPos] = useState({ x: 0, y: 0 });
 
   const noBtnRef = useRef<HTMLButtonElement | null>(null);
 
+  // 🔁 Reset cuando se abre/cierra
   useEffect(() => {
-    if (openQuest) {
-      setPhase("question");
-      setNoCount(0);
-      setHasMovedNo(false);
-      setNoPos({ x: 0, y: 0 });
-    }
+    setPhase("question");
+    setNoCount(0);
+    setHasMovedNo(false);
+    setNoPos({ x: 0, y: 0 });
   }, [openQuest]);
 
   const randomizeNoButton = () => {
@@ -52,28 +49,29 @@ function QuestionCard({ openQuest, AcceptQuest }: QuestionCardProps) {
       const next = prev + 1;
 
       if (next >= 5) {
-        setPhase("video"); 
+        setPhase("video");
         return next;
       }
 
-      if (!hasMovedNo) setHasMovedNo(true);
-
       randomizeNoButton();
+      setHasMovedNo(true);
+
       return next;
     });
   };
 
-  // ✅ Imagen normal vs imagen "after" (Snoopy cambia)
-  const questionImg = config!.imagenPregunta;
-  const afterImg =
-    (config as any)?.imagenSnoopyAfter ?? "src\components\LIONS3.png"; // poné tu ruta real
+  // 🖼️ IMÁGENES
+  const questionImg = LIONS3;
+  const afterImg = AFTER_IMG;
 
-  // ✅ Texto opcional para after
-  const afterText = (config as any)?.preguntaAfter ?? "Ok… solo te queda decir que sí 😈";
+  const afterText =
+    (config as any)?.preguntaAfter ?? "NO PUES NI MODO, TOCA PORQUE TOCA";
+
+  if (!config) return null;
 
   return (
     <>
-      {/* ====== CARD PRINCIPAL (question/after) ====== */}
+      {/* ====== CARD PRINCIPAL ====== */}
       {(phase === "question" || phase === "after") && (
         <div
           className={`bg-gray-600/30 border flex gap-4 flex-col border-white/10 rounded-2xl p-4 transition-all duration-700 ${
@@ -81,7 +79,7 @@ function QuestionCard({ openQuest, AcceptQuest }: QuestionCardProps) {
           }`}
         >
           <h2 className="text-4xl font-bold text-center text-red-700">
-            {phase === "after" ? afterText : config!.pregunta}
+            {phase === "after" ? afterText : config.pregunta}
           </h2>
 
           <img
@@ -91,7 +89,6 @@ function QuestionCard({ openQuest, AcceptQuest }: QuestionCardProps) {
           />
 
           <div className="flex items-center gap-4 justify-evenly flex-col md:flex-row">
-            {/* ✅ SI normal vs SI gigante */}
             <button
               type="button"
               onClick={AcceptQuest}
@@ -101,10 +98,9 @@ function QuestionCard({ openQuest, AcceptQuest }: QuestionCardProps) {
                   : "w-40 px-4 py-1 border rounded bg-green-500/50 hover:bg-green-500/70"
               }
             >
-              {config!.botonAceptar}
+              {config.botonAceptar}
             </button>
 
-            {/* ✅ NO SOLO EXISTE EN QUESTION */}
             {phase === "question" && !hasMovedNo && (
               <button
                 ref={noBtnRef}
@@ -112,14 +108,14 @@ function QuestionCard({ openQuest, AcceptQuest }: QuestionCardProps) {
                 onClick={handleNoClick}
                 className="w-40 px-4 py-1 border rounded bg-red-500/50 hover:bg-red-500/70"
               >
-                {config!.botonRechazar}
+                {config.botonRechazar}
               </button>
             )}
           </div>
         </div>
       )}
 
-      {/* ====== NO FLOTANTE (solo question, después del primer click) ====== */}
+      {/* ====== NO FLOTANTE ====== */}
       {openQuest && phase === "question" && hasMovedNo && (
         <button
           ref={noBtnRef}
@@ -133,11 +129,11 @@ function QuestionCard({ openQuest, AcceptQuest }: QuestionCardProps) {
           }}
           className="w-40 px-4 py-1 border rounded bg-red-500/50 hover:bg-red-500/70"
         >
-          {config!.botonRechazar}
+          {config.botonRechazar}
         </button>
       )}
 
-      {/* ====== VIDEO (fase video) ====== */}
+      {/* ====== VIDEO ====== */}
       {openQuest && phase === "video" && (
         <div className="fixed inset-0 z-[10000] bg-black/80 flex items-center justify-center p-4">
           <div className="bg-white/10 border border-white/20 rounded-2xl p-4 max-w-xl w-full">
@@ -149,16 +145,10 @@ function QuestionCard({ openQuest, AcceptQuest }: QuestionCardProps) {
               autoPlay
               controls
               className="w-full rounded-xl"
-              // ✅ Opción A (si lo pusiste en public/):
               src="src\components\SEALIONS2.mp4"
-              
-              onEnded={() => {
-                // ✅ cuando termina, regresa a opciones pero SIN NO y con cambios
-                setPhase("after");
-              }}
+              onEnded={() => setPhase("after")}
             />
 
-            {/* opcional: si querés que NO puedan saltarse el final, quitá este botón */}
             <button
               className="mt-4 w-full py-2 rounded-xl bg-white/10 hover:bg-white/20 border text-white"
               onClick={() => setPhase("after")}
